@@ -60,13 +60,26 @@ public class BoardDAO {
 		ResultSet rs = null;
 		int count = 0;
 		String sql ="select count(*) from board";
-		if(select!=null) {
+		if(select==null || select.equals("")) {
+			sql ="select count(*) from board";
+		}else {
 			if(select.equals("subject_content")) {
 				sql = "select count(*) from board where subject like '%"+search+"%' or content like '%"+search+"%' ";
-			}else sql = "select count(*) from board where "+select+" like '%"+search+"%'";
-		}
+			}else {
+				sql = "select count(*) from board where "+select+" like '%"+search+"%'";
+			}
+			}
+		
+// 		String sql ="select count(*) from board";
+//		if(select!=null || !select.equals("")) { // null이 아니라면 실행되지 않는 구문
+//			if(select.equals("subject_content")) {
+//				sql = "select count(*) from board where subject like '%"+search+"%' or content like '%"+search+"%' ";
+//			}else {
+//				sql = "select count(*) from board where "+select+" like '%"+search+"%'";
+//			}
+//		}
 		try {
-			System.out.println(sql);
+			System.out.println("searchCount::::"+sql);
 			con = pool.getConnection();
 			pstmt = con.prepareStatement(sql);
 			
@@ -75,7 +88,7 @@ public class BoardDAO {
 			if(rs.next()) {
 			count = rs.getInt(1);
 			}
-			System.out.println("총 레코드 수 :"+count);
+			System.out.println("검색에 따른 총 레코드 수 :"+count);
 			
 		}catch(Exception e) {
 			System.out.println("getArticleCount 실패"+e);
@@ -86,7 +99,7 @@ public class BoardDAO {
 	}
 	
 	// (2) 검색어에 따른 게시판 목록 물러오기
-	public ArrayList<BoardDTO> getBoardArticles(String select,String search,int start,int end) {
+	public ArrayList<BoardDTO> getSearchList(String select,String search,int start,int end) {
 		
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -95,7 +108,7 @@ public class BoardDAO {
 		ArrayList<BoardDTO> zipcode = new ArrayList(end); // 생성자로 초기 공간을 지정
 		BoardDTO code ;
 		String sql="";
-		if(select==null) {
+		if(select==null || select.equals("") ) {
 			sql = "select  * from board order by ref desc,re_step asc limit "+(start)+","+end;
 		}else {
 			if(select.equals("subject_content")) {
@@ -107,7 +120,7 @@ public class BoardDAO {
 						+"%' order by ref desc,re_step asc limit "+(start)+","+end;
 			}
 		}
-		System.out.println("getBoard()2"+sql);
+		System.out.println("getsearch()2::::"+sql);
 		
 		try {
 			con=pool.getConnection();
@@ -164,7 +177,7 @@ public class BoardDAO {
 			    int blockSize = 5;    //한 블록당 보여주는 페이지의 수
 		//2 전체 레코드 개수 확인
 		//int count = count;
-			    System.out.println("개수 체크용 "+count);
+			    System.out.println("pageList count 개수 체크용  "+count);
 		// DB상의 레코드 시작 번호 limit 수치
 		int startRow = (currentPage-1)*pageSize;
 		int endRow = currentPage*pageSize;

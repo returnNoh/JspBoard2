@@ -108,7 +108,26 @@
 
  </c:if>
  
+ 
+ 
   </tr>
+  <p>
+  <form name="test" method="get" action="/JspBoard2/list.do">
+<tr>
+<td>
+<select name="select">
+<option value="subject"> 글 제목 </option>
+<option value="subject_content"> 제목+본문 </option>
+<option value="writer"> 작성자 </option>
+</select>
+</td>
+<td>
+<input type="text" name="search" size="15" ><input type="button" value="검색" onclick="search()">
+</td>
+
+
+</tr>
+</form>
 </center>
 </body>
 </html>

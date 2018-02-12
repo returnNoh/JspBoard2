@@ -3,6 +3,13 @@
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     		<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%
+	//HashtaMap paList = (HashMap) request.getAttribute("pgList");
+	//pgList.get("count") = > ${pgList.count}
+	//System.out.println("이거맞나"+request.getAttribute("list"));
+	
+	
+%>
 <html>
 <head>
 <title>게시판</title>
@@ -10,15 +17,14 @@
 </head>
 
 <body bgcolor="#e0ffff">
-<center><b>글목록(전체 글:${count})</b>
+<center><b>글목록(전체 글:${pgList.beginPerPage})</b>
 <table width="700">
 <tr>
     <td align="right" bgcolor="#b0e0e6">
     <a href="/JspBoard2/writeForm.do">글쓰기</a>
     </td>
 </table>
-
-<c:if test="${count==0}">
+<c:if test="${pgList.count==0}">
 <table border="1" width="700" cellpadding="0" cellspacing="0" align="center"> 
 <tr>
 <td align="center">게시판에 저장된 글이 없습니다.</td>
@@ -27,7 +33,7 @@
 </c:if>
 
 
-<c:if test="${count>0}">
+<c:if test="${pgList.beginPerPage>0}">
 <table border="1" width="700" cellpadding="0" cellspacing="0" align="center"> 
     <tr height="30" bgcolor="#b0e0e6"> 
       <td align="center"  width="50"  >번 호</td> 
@@ -38,9 +44,11 @@
       <td align="center"  width="100" >IP</td>    
     </tr>
     
+    
+    <c:set var="beginPerPage" value="${pgList.beginPerPage}"/>
     <c:forEach var="list" items="${list}">
     
-   <tr height="30">
+   <tr height="30" onmouseover="this.style.backgroundColor='blue'" onmouseout="this.style.backgroundColor='#e0ffff'">
    
     <td align="center"  width="50" >
     <c:out value="${beginPerPage}"/>
@@ -58,7 +66,7 @@
 	  <img src="images/level.gif" width="0" height="16">
 	  </c:if>        
 	  
-      <a href="/JspBoard2/content.do?num=${list.num}&pageNum=${currentPage}">
+      <a href="/JspBoard2/content.do?num=${list.num}&pageNum=${pgList.currentPage}">
            ${list.subject}</a> 
          
          <c:if test="${list.readcount>=20}">
@@ -68,7 +76,9 @@
          </td>
     <td align="center"  width="100"> 
        <a href="mailto:${list.email}">${list.writer}</a></td>
-    <td align="center"  width="150">${list.reg_date}</td>
+    <td align="center"  width="150">
+    <fmt:formatDate value="${list.reg_date}" timeStyle="medium" pattern="yy.MM.dd (hh:mm)"/>
+    </td>
     <td align="center"  width="50">${list.readcount}</td>
     <td align="center" width="100" >${list.ip}</td>
   </tr>
@@ -76,42 +86,33 @@
   
 </table>
  </c:if>
- 
-
 <tr align="center">
-<c:if test="${count>0}">
-<c:set var="pageCount" value="${count/pageSize+(count%pageSize==0?0:1)}"/>
-<c:set var="startPage" value="${currentPage-((currentPage-1)%blockSize)}"/>
-<c:set var="endPage" value="${startPage+blockSize-1}"/>
-<c:if test="${endPage>pageCount}">
-<c:set var="endPage" value="${pageCount}"/>
-</c:if>
-<c:if test="${startPage>blockSize}">
-<a href="/JspBoard2/list.do?pageNum=${startPage-blockSize}">[이전]</a>
+
+<c:if test="${pgList.startPage>pgList.blockSize}">
+<a href="/JspBoard2/list.do?pageNum=${pgList.startPage-pgList.blockSize}&select=${select}&search=${search}">[이전]</a>
 </c:if>
 
-<c:forEach var="i" begin="${startPage}" end="${endPage}">
+<c:forEach var="i" begin="${pgList.startPage}" end="${pgList.endPage}">
 
-<c:if test="${i==currentPage}"> 
-<a href="/JspBoard2/list.do?pageNum=${i}"><b>${i}</b></a>
+<c:if test="${i==pgList.currentPage}"> 
+<a href="/JspBoard2/list.do?pageNum=${i}&select=${select}&search=${search}">
+<font color="red>"><b>[${i}]</b></font>
+</a>
 </c:if>
 
-<c:if test="${i!=currentPage}">
-<a href="/JspBoard2/list.do?pageNum=${i}">${i}</a>
+<c:if test="${i!=pgList.currentPage}">
+<a href="/JspBoard2/list.do?pageNum=${i}&select=${select}&search=${search}">${i}</a>
 </c:if>
 
 </c:forEach>
 
-<c:if test="${endPage<pageCount}">
-<a href="/JspBoard2/list.do?pageNum=${startPage+blockSize}">[다음]</a>
+<c:if test="${pgList.endPage<pgList.pageCount}">
+<a href="/JspBoard2/list.do?pageNum=${pgList.startPage+pgList.blockSize}&select=${select}&search=${search}">[다음]</a>
 </c:if>
 
- </c:if>
- 
- 
- 
   </tr>
-  <p>
+  
+    <p>
   <form name="test" method="get" action="/JspBoard2/list.do">
 <tr>
 <td>
@@ -128,6 +129,7 @@
 
 </tr>
 </form>
+  
 </center>
 </body>
 </html>
